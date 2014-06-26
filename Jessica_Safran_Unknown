@@ -1,0 +1,105 @@
+float theta;   
+
+PGraphics pg;
+
+int WIDTH = 4724;
+int HEIGHT = 5906;
+float RATIO = 11.812;
+
+void setup() {
+  
+  size(400, 500);
+  noLoop();
+  
+  pg = createGraphics(4724, 5906); 
+  pg.strokeWeight(RATIO);
+   
+}
+
+void draw() {
+  
+  pg.beginDraw();
+  pg.background(0);
+ 
+  pg.stroke(138, 21, 211);
+  pg.strokeWeight(RATIO);
+    
+  float a = (15 / (float) width) * 180f;
+  
+  // Convert it to radians
+  theta = radians(a);
+
+  // Start the tree from the bottom of the screen
+  pg.translate(WIDTH/2, HEIGHT);
+  
+  pg.line(0,0,0,-130 * RATIO);
+  pg.translate(0,-130 * RATIO);
+  
+  branch(130);
+ 
+  pg.endDraw();
+  image (pg, 0, 0, 400, 500); // show the result on screen 
+
+  print (".");
+  PImage output = pg.get();  
+  saveTimestamped(output);
+  print (":");
+}
+
+void branch(float h) {
+  
+  // Each branch will be 2/3rds the size of the previous one
+  h *= 0.73;
+  
+  
+  // All recursive functions must have an exit condition!!!!
+  // Here, ours is when the length of the branch is 2 pixels or less
+ 
+  
+  if (h > 2) { // > (2  * RATIO)) {
+    pg.pushMatrix();    // Save the current state of transformation (i.e. where are we now)
+    pg.rotate(theta);   // Rotate by theta
+ //   pg.line(0, 0, 0, -h * RATIO);  // Draw the branch
+ 
+   ellipse (0,0, 100, 100);
+    pg.translate(0, -h * RATIO); // Move to the end of the branch
+    branch(h);       // Ok, now call myself to draw two new branches!!
+    pg.popMatrix();     // Whenever we get back here, we "pop" in order to restore the previous matrix state
+    
+    // Repeat the same thing, only branch off to the "left" this time!
+    pg.pushMatrix();
+ 
+    pg.rotate(-theta);
+    pg.stroke(10, 0, 220);
+    pg.line(0, 0, 0, -h * RATIO);
+    pg.translate(0, -h * RATIO);
+    pg.stroke(25, 200, 255);
+    branch(h);
+    pg.popMatrix();
+  }
+  
+//  stroke(130, 10, 240);`
+//  fill(200, 0, 100, 255);
+//  ellipse(70, 70, 3, 3);
+  
+  pg.stroke(130, 10, 240);
+  pg.fill(200, 0, 100, 255);
+  pg.ellipse(70 * RATIO, 70 * RATIO, 3 * RATIO, 8 * RATIO);
+ 
+  
+}
+
+
+// saves the image with a timestamped filename
+void saveTimestamped(PImage im) {
+  int s = second();  // Values from 0 - 59
+  int mi = minute();  // Values from 0 - 59
+  int h = hour();    // Values from 0 - 23
+  int d = day();    // Values from 1 - 31
+  int m = month();  // Values from 1 - 12
+  int y = year();   // 2003, 2004, 2005, etc.
+  
+  String filename = y+"-"+m+"-"+d+"-"+h+"-"+mi+"-"+s+".tiff";
+   im.save(filename); 
+  
+} 
