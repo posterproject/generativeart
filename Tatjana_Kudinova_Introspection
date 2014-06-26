@@ -1,0 +1,251 @@
+// This sketch writes everything onto a PGraphics object, shows it on screen, and then saves it
+// timestamped.
+
+// Resulting TIFF File is standard poster size. 
+
+PImage img;
+PGraphics pg;
+float radius;
+
+void setup() {
+
+  size(400, 500, P3D);  // on screen size
+
+  radius = 1100;
+  pg = createGraphics(4724, 5906, P3D);   // print size  
+
+  smooth(4);  // antialiasing optional. Delete this for no antialiasing.
+  noLoop(); // We only need to run draw() once.
+
+  
+}
+
+
+void drawPoint(float x, float y, float noiseFactor) { 
+  pg.pushMatrix();
+
+  pg.translate(x * noiseFactor * 3, y * noiseFactor * 2, -y); 
+
+  float edgeSize = noiseFactor * 1;
+
+  pg.stroke(30, 30, 40, 250);
+  pg.strokeWeight(0.1);
+
+  pg.line(width/2 - 10, height/2 - 10, width/2 - 10, height/2 + 10);
+
+  pg.popMatrix();
+}
+
+
+void doRender() {
+  float xstart = random(900);
+  float ynoise = random(500);
+
+  pg.translate(pg.width/2, pg.height/2, 10);
+
+  for (float y = - (pg.height/2); y <= (pg.height/2); y+=1) {
+    ynoise += 0.11;
+    float xnoise = xstart;
+
+    for (float x = - (pg.width/2); x <= (pg.width/2); x+=1) {
+      xnoise += 0.01;
+      drawPoint(x, y, noise(xnoise, ynoise));
+    }
+  }
+}
+
+void doMask() {
+   
+   pg.loadPixels();
+   for(int x=0; x < pg.width; x++){
+     for(int y=0; y < pg.height; y++){
+   
+       PVector center = new PVector(pg.width/2, pg.height/2);
+       PVector position = new PVector(x,y);
+       PVector diff = PVector.sub(center, position);
+   
+       if( diff.mag() < radius ){
+       // circleMask.pixels[x+y*circleMask.width] = color(0,0,0,0);
+       }else{
+         pg.pixels[x+y*pg.width] = color(0,0,0,255);
+       }
+     }   
+   }
+   pg.updatePixels();
+   
+}
+
+
+
+void draw() {
+
+  // we start writing onto the PGraphics object
+  // in this example we write a red circle and some random lines  
+
+  pg.beginDraw();
+  pg.background(200, 70, 20, 255);
+
+
+  /*
+  pg.stroke(255);
+   pg.strokeWeight(10);
+   
+   pg.stroke(255,255,255,120);
+   for (int i = 0; i < 150; i++) {  
+   pg.line(random(100, 4624),random(100, 5806),random(100, 4624),random(100, 5806));
+   }
+   */
+
+  doRender();
+  doMask(); 
+
+
+  pg.endDraw();
+
+  // finished writing to the PGraphics object 
+
+
+  image (pg, 0, 0, 400, 500); // show the result on screen 
+  // save the 
+  PImage output = pg.get();  
+  saveTimestamped(output);
+}
+
+
+// saves the image with a timestamped filename
+void saveTimestamped(PImage im) {
+  int s = second();  // Values from 0 - 59
+  int mi = minute();  // Values from 0 - 59
+  int h = hour();    // Values from 0 - 23
+  int d = day();    // Values from 1 - 31
+  int m = month();  // Values from 1 - 12
+  int y = year();   // 2003, 2004, 2005, etc.
+
+  String filename = y+"-"+m+"-"+d+"-"+h+"-"+mi+"-"+s+".tiff";
+  im.save(filename);
+}// This sketch writes everything onto a PGraphics object, shows it on screen, and then saves it
+// timestamped.
+
+// Resulting TIFF File is standard poster size. 
+
+PImage img;
+PGraphics pg;
+float radius;
+
+void setup() {
+
+  size(400, 500, P3D);  // on screen size
+
+  radius = 1100;
+  pg = createGraphics(4724, 5906, P3D);   // print size  
+
+  smooth(4);  // antialiasing optional. Delete this for no antialiasing.
+  noLoop(); // We only need to run draw() once.
+
+  
+}
+
+
+void drawPoint(float x, float y, float noiseFactor) { 
+  pg.pushMatrix();
+
+  pg.translate(x * noiseFactor * 3, y * noiseFactor * 2, -y); 
+
+  float edgeSize = noiseFactor * 1;
+
+  pg.stroke(30, 30, 40, 250);
+  pg.strokeWeight(0.1);
+
+  pg.line(width/2 - 10, height/2 - 10, width/2 - 10, height/2 + 10);
+
+  pg.popMatrix();
+}
+
+
+void doRender() {
+  float xstart = random(900);
+  float ynoise = random(500);
+
+  pg.translate(pg.width/2, pg.height/2, 10);
+
+  for (float y = - (pg.height/2); y <= (pg.height/2); y+=1) {
+    ynoise += 0.11;
+    float xnoise = xstart;
+
+    for (float x = - (pg.width/2); x <= (pg.width/2); x+=1) {
+      xnoise += 0.01;
+      drawPoint(x, y, noise(xnoise, ynoise));
+    }
+  }
+}
+
+void doMask() {
+   
+   pg.loadPixels();
+   for(int x=0; x < pg.width; x++){
+     for(int y=0; y < pg.height; y++){
+   
+       PVector center = new PVector(pg.width/2, pg.height/2);
+       PVector position = new PVector(x,y);
+       PVector diff = PVector.sub(center, position);
+   
+       if( diff.mag() < radius ){
+       // circleMask.pixels[x+y*circleMask.width] = color(0,0,0,0);
+       }else{
+         pg.pixels[x+y*pg.width] = color(0,0,0,255);
+       }
+     }   
+   }
+   pg.updatePixels();
+   
+}
+
+
+
+void draw() {
+
+  // we start writing onto the PGraphics object
+  // in this example we write a red circle and some random lines  
+
+  pg.beginDraw();
+  pg.background(200, 70, 20, 255);
+
+
+  /*
+  pg.stroke(255);
+   pg.strokeWeight(10);
+   
+   pg.stroke(255,255,255,120);
+   for (int i = 0; i < 150; i++) {  
+   pg.line(random(100, 4624),random(100, 5806),random(100, 4624),random(100, 5806));
+   }
+   */
+
+  doRender();
+  doMask(); 
+
+
+  pg.endDraw();
+
+  // finished writing to the PGraphics object 
+
+
+  image (pg, 0, 0, 400, 500); // show the result on screen 
+  // save the 
+  PImage output = pg.get();  
+  saveTimestamped(output);
+}
+
+
+// saves the image with a timestamped filename
+void saveTimestamped(PImage im) {
+  int s = second();  // Values from 0 - 59
+  int mi = minute();  // Values from 0 - 59
+  int h = hour();    // Values from 0 - 23
+  int d = day();    // Values from 1 - 31
+  int m = month();  // Values from 1 - 12
+  int y = year();   // 2003, 2004, 2005, etc.
+
+  String filename = y+"-"+m+"-"+d+"-"+h+"-"+mi+"-"+s+".tiff";
+  im.save(filename);
+}
