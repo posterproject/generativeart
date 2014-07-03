@@ -1,1 +1,112 @@
-//TBD
+// 1 Pixel Star Wars
+// Edward Richardson
+// edrichardson@mac.com
+// 2014
+//
+// ITP Camp - Summer 2014
+//
+//
+// Most of the code courtesy of Tomas and Tatjana
+// 
+
+
+int xFrames, yFrames;
+int sidePadding, internalPadding, topPadding;
+
+PImage img;
+PGraphics pg;
+
+
+void setup () {
+
+  size(472, 591);  // on screen size
+  pg = createGraphics(4724, 5906);   // print size  
+  //smooth(4);  // antialiasing optional. Commented out for no antialiasing.
+
+
+  // close to the aspect ratio of the print
+  xFrames = 374;
+  yFrames = 469;
+
+  sidePadding = 305;
+  internalPadding = 0;
+  topPadding = 305;
+
+  noLoop(); // just need to do this once
+}
+
+
+
+void draw () {
+
+  // high resolution output, so we draw into a PGraphics object
+  pg.beginDraw();
+  pg.background(255);
+
+  // a little help figuring out how to spread these out
+  // also used a spreadsheet to experiment with different values of padding and XY resolution
+  // wanted equal padding and each rectangle to exist at a whole number location - not between output pixels
+  int totalInternalPadding = internalPadding * (xFrames - 1);
+  int totalPadding = totalInternalPadding + (sidePadding * 2); 
+  int pixelsPerFrame = (pg.width - totalPadding) / xFrames; // each frame will be this many pixels wide
+  
+  
+  // Open the 1 pixel movie images file and read its binary data
+  // the file has a byte for each color and 3 bytes represents 1 frame of the movie
+  byte b[] = loadBytes("sampleRGB.dat");  // sample file with RGB/Luma ramps
+  int byteCount = 0;
+
+  // going left to right, line by line
+  for (int y = 0; y < yFrames; y++) {
+    for (int x = 0; x < xFrames; x++) {
+
+      // determine where each rectangle will be drawn
+      int xRect = (sidePadding + x*pixelsPerFrame + x*internalPadding);
+      int yRect = (topPadding + y*pixelsPerFrame + y*internalPadding);
+
+      pg.noStroke();
+
+      if ( byteCount < b.length ) {
+        // bytes are from -128 to 127, this converts to 0 to 255 
+        int red = b[(byteCount + 0)] & 0xff;
+        int green = b[(byteCount + 1)] & 0xff;
+        int blue = b[(byteCount + 2)] & 0xff;
+
+        // set the fillcolor 
+        pg.fill(red, green, blue);
+      } else {           // if you get to the end of the file, fill white
+        pg.fill(255);
+      }
+
+      // make a rectangle in the location calculated at this start of this for loop,
+      // with the width//height we calculated in setup
+      pg.rect (xRect, yRect, pixelsPerFrame, pixelsPerFrame);
+
+      //next frame of the movie will be 3 bytes farther into the file
+      byteCount = byteCount + 3;
+    }
+  }
+
+  pg.endDraw();
+
+  image (pg, 0, 0, width, height); // show the result on screen
+
+  PImage output = pg.get();  
+  saveTimestamped(output);
+
+}
+
+
+
+// saves the image with a timestamped filename
+void saveTimestamped(PImage im) {
+  int s = second();  // Values from 0 - 59
+  int mi = minute();  // Values from 0 - 59
+  int h = hour();    // Values from 0 - 23
+  int d = day();    // Values from 1 - 31
+  int m = month();  // Values from 1 - 12
+  int y = year();   // 2003, 2004, 2005, etc.
+
+  String filename = y+"-"+m+"-"+d+"-"+h+"-"+mi+"-"+s+".tiff";
+  im.save(filename);
+} //TBD
