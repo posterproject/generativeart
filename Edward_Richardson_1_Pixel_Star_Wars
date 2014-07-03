@@ -109,4 +109,4 @@ void saveTimestamped(PImage im) {
 
   String filename = y+"-"+m+"-"+d+"-"+h+"-"+mi+"-"+s+".tiff";
   im.save(filename);
-} //TBD
+}
